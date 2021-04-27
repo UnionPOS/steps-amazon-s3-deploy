@@ -181,6 +181,8 @@ begin
   end
 
   ENV['S3_DEPLOY_STEP_URL_IPA'] = "#{public_url_ipa}"
+  ENV['APP_ICON_URL'] = "#{app_icon_url}"
+  ENV['ITUNES_ICON_URL'] = "#{itunes_icon_url}"
 
   #
   # plist generation - we have to run it after we have obtained the public url to the ipa
@@ -190,24 +192,24 @@ begin
 
   fail 'Failed to generate info.plist' unless success
 
-  log_done('Generating Info.plist succed')
+  plist_name = ENV["GENERATED_PLIST_NAME"]
+  log_done("Generating #{plist_name} succeeded")
 
   #
   # plist upload
-  plist_local_path = 'Info.plist'
+  plist_local_path = ENV["DEPLOY_PLIST_PATH"]
   public_url_plist = ''
 
   if File.exist?(plist_local_path)
-    log_info('Uploading Info.plist...')
+    log_info("Uploading #{plist_name}...")
 
-    plist_path_in_bucket = "#{base_path_in_bucket}/Info.plist"
+    plist_path_in_bucket = "#{base_path_in_bucket}/#{plist_name}"
     plist_full_s3_path = "s3://#{options[:bucket_name]}/#{plist_path_in_bucket}"
     public_url_plist = public_url_for_bucket_and_path(options[:bucket_name], options[:bucket_region], plist_path_in_bucket)
 
-    fail 'Failed to upload Info.plist' unless do_s3upload(plist_local_path, plist_full_s3_path, acl_arg)
-    fail 'Failed to remove Plist' unless system(%Q{rm "#{plist_local_path}"})
+    fail "Failed to upload #{plist_name}" unless do_s3upload(plist_local_path, plist_full_s3_path, acl_arg)
 
-    log_done('Info.plist upload success')
+    log_done("#{plist_name} upload success")
   else
     log_warn('NO Info.plist generated :<')
   end
@@ -225,10 +227,10 @@ begin
   if options[:dsym]
     log_details("* DSYM: #{public_url_dsym}")
   else
-    log_warn(%Q{DSYM file not found.
+    log_warn("%Q{DSYM file not found.
       To generate debug symbols (dSYM) go to your
       Xcode Project's Settings - `Build Settings - Debug Information Format`
-      and set it to **DWARF with dSYM File**.})
+      and set it to **DWARF with dSYM File**.}")
   end
 
   log_details("* Plist: #{public_url_plist}")

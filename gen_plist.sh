@@ -29,8 +29,10 @@ APP_NAME=${APP_BASE_NAME%.app}
 
 BUNDLEID=`/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" ./Payload/"$APP_BASE_NAME"/Info.plist`
 BUNDLESHORTVER=`/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ./Payload/"$APP_BASE_NAME"/Info.plist`
+BUILDVER=`/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" ./Payload/"$APP_BASE_NAME"/Info.plist`
 
-generated_plist_path="./Info.plist"
+export GENERATED_PLIST_NAME="${APP_NAME}.${BUILDVER}.plist"
+generated_plist_path="./${GENERATED_PLIST_NAME}"
 if [ -e "${generated_plist_path}" ]; then
 	rm "${generated_plist_path}"
 fi
@@ -54,13 +56,13 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
         			<key>kind</key>
         			<string>display-image</string>
         			<key>url</key>
-        			<string>$app_icon_url</string>
+        			<string>$APP_ICON_URL</string>
       			</dict>
       			<dict>
         			<key>kind</key>
         			<string>full-size-image</string>
         			<key>url</key>
-        			<string>$itunes_icon_url</string>
+        			<string>$ITUNES_ICON_URL</string>
       		</dict>
 			</array>
 			<key>metadata</key>
@@ -78,5 +80,8 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 	</array>
 </dict>
 </plist>" > "${generated_plist_path}"
+
+export DEPLOY_PLIST_PATH="${BITRISE_DEPLOY_DIR}/${GENERATED_PLIST_NAME}"
+cp "$generated_plist_path" "$DEPLOY_PLIST"
 
 rm -rf ./Payload
