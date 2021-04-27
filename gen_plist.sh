@@ -56,13 +56,13 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
         			<key>kind</key>
         			<string>display-image</string>
         			<key>url</key>
-        			<string>$APP_ICON_URL</string>
+        			<string>$app_icon_url</string>
       			</dict>
       			<dict>
         			<key>kind</key>
         			<string>full-size-image</string>
         			<key>url</key>
-        			<string>$ITUNES_ICON_URL</string>
+        			<string>$itunes_icon_url</string>
       		</dict>
 			</array>
 			<key>metadata</key>

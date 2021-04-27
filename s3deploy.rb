@@ -181,12 +181,10 @@ begin
   end
 
   ENV['S3_DEPLOY_STEP_URL_IPA'] = "#{public_url_ipa}"
-  ENV['APP_ICON_URL'] = "#{app_icon_url}"
-  ENV['ITUNES_ICON_URL'] = "#{itunes_icon_url}"
 
   #
   # plist generation - we have to run it after we have obtained the public url to the ipa
-  log_info('Generating Info.plist...')
+  log_info('Generating Deploy Info.plist...')
 
   success = system("sh #{@this_script_path}/gen_plist.sh")
 
