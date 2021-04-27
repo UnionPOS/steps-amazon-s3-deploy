@@ -70,7 +70,9 @@ options = {
   bucket_name: ENV['bucket_name'],
   bucket_region: ENV['bucket_region'],
   path_in_bucket: ENV['path_in_bucket'],
-  acl: ENV['file_access_level']
+  acl: ENV['file_access_level'],
+  app_icon_url: ENV['app_icon_url'],
+  itunes_icon_url: ENV['itunes_icon_url']
 }
 
 #
@@ -92,6 +94,9 @@ log_details("* bucket_region: #{options[:bucket_region]}")
 log_details("* path_in_bucket: #{options[:path_in_bucket]}")
 log_details("* file_access_level: #{options[:acl]}")
 
+log_details("* app_icon_url: #{options[:app_icon_url]}")
+log_details("* itunes_icon_url: #{options[:itunes_icon_url]}")
+
 status = 'success'
 begin
   #
@@ -111,6 +116,9 @@ begin
 
   fail 'Missing required input: bucket_name' if options[:bucket_name].to_s.eql?('')
   fail 'Missing required input: file_access_level' if options[:acl].to_s.eql?('')
+
+  fail 'Missing required input: app_icon_url' if options[:app_icon_url].to_s.eql?('')
+  fail 'Missing required input: itunes_icon_url' if options[:itunes_icon_url].to_s.eql?('')
 
   #
   # AWS configs
@@ -177,6 +185,8 @@ begin
   #
   # plist generation - we have to run it after we have obtained the public url to the ipa
   log_info('Generating Info.plist...')
+  export_output('APP_ICON_URL', app_icon_url)
+  export_output('ITUNES_ICON_URL', itunes_icon_url)
 
   success = system("sh #{@this_script_path}/gen_plist.sh")
 

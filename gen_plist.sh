@@ -50,6 +50,18 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 					<key>url</key>
 					<string>$S3_DEPLOY_STEP_URL_IPA</string>
 				</dict>
+				<dict>
+        			<key>kind</key>
+        			<string>display-image</string>
+        			<key>url</key>
+        			<string>$APP_ICON_URL</string>
+      			</dict>
+      			<dict>
+        			<key>kind</key>
+        			<string>full-size-image</string>
+        			<key>url</key>
+        			<string>$ITUNES_ICON_URL</string>
+      		</dict>
 			</array>
 			<key>metadata</key>
 			<dict>

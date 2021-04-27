@@ -1,9 +1,8 @@
-title: Deploy to Amazon S3
+title: Upload to MDM
 summary: Upload your iOS Application to Amazon S3
 description: |-
-  This step deploys an Xcode archive to Amazon S3.
+  This step deploys an Xcode archive to Amazon S3 to be made available for MDM.
   Requirements: An Xcode Archive Step must run before this step and you must have an Amazon S3 account. 
-  To register an Amazon S3 account, [click here](http://aws.amazon.com/s3/).
 website: https://github.com/bitrise-io/steps-amazon-s3-deploy
 source_code_url: https://github.com/bitrise-io/steps-amazon-s3-deploy
 support_url: https://github.com/bitrise-io/steps-amazon-s3-deploy/issues
@@ -94,6 +93,21 @@ inputs:
       value_options:
         - "private"
         - "public_read"
+      is_required: true
+  - app_icon_url: ""
+    opts:
+      title: "App Icon URL"
+      summary: ""
+      description: |
+        MDM implementations require this for displaying in custom store.
+        This image also gets used when installation in progress.
+      is_required: true
+  - itunes_icon_url: ""
+    opts:
+      title: "iTunes Icon URL"
+      summary: ""
+      description: |
+        MDM implementations require this for displaying in custom store.
       is_required: true
 outputs:
   - S3_DEPLOY_STEP_URL_IPA: ""
