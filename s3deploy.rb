@@ -185,8 +185,6 @@ begin
   #
   # plist generation - we have to run it after we have obtained the public url to the ipa
   log_info('Generating Info.plist...')
-  export_output('APP_ICON_URL', app_icon_url)
-  export_output('ITUNES_ICON_URL', itunes_icon_url)
 
   success = system("sh #{@this_script_path}/gen_plist.sh")
 
