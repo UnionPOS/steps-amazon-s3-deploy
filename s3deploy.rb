@@ -144,7 +144,7 @@ begin
 
   #
   # define object path
-  plist_upload_name = "#{app_name}.#{build_number}.ipa"
+  plist_upload_name = "#{options[:app_name]}.#{options[:build_number]}.ipa"
   base_path_in_bucket = ''
   if options[:path_in_bucket]
     base_path_in_bucket = options[:path_in_bucket]
@@ -202,7 +202,13 @@ begin
   # plist generation - we have to run it after we have obtained the public url to the ipa
   log_info('Generating Deploy Info.plist...')
 
-  plist=IpaInstallPlistGenerator::PlistGenerator.new.generate_plist_string(ipa_url, bundle_id, app_name, bundle_version, app_icon_url, itunes_icon_url)
+  app_name=options[:app_name]
+  bundle_id=options[:bundle_id]
+  bundle_version=options[:bundle_version]
+  app_icon_url=options[:app_icon_url]
+  itunes_icon_url=options[:itunes_icon_url]
+  build_number=options[:build_number]
+  plist=IpaInstallPlistGenerator::PlistGenerator.new.generate_plist_string(public_url_ipa, bundle_id, app_name, bundle_version, app_icon_url, itunes_icon_url)
 
   plist_file="#{app_name}.#{build_number}.plist"
   File.open("#{plist_file}", "w") do |f|
