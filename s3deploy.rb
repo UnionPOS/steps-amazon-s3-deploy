@@ -44,15 +44,15 @@ def log_done(message)
 end
 
 def s3_object_uri_for_bucket_and_path(bucket_name, path_in_bucket)
-  return "s3://#{bucket_name}/#{path_in_bucket}"
+  return "s3://#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
 end
 
 def public_url_for_bucket_and_path(bucket_name, bucket_region, path_in_bucket)
   if bucket_region.to_s == '' || bucket_region.to_s == 'us-east-1'
-    return "https://s3.amazonaws.com/#{bucket_name}/#{path_in_bucket}"
+    return "https://s3.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
   end
 
-  return "https://s3-#{bucket_region}.amazonaws.com/#{bucket_name}/#{path_in_bucket}"
+  return "https://s3-#{bucket_region}.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
 end
 
 def export_output(out_key, out_value)
@@ -144,7 +144,7 @@ begin
 
   #
   # define object path
-  plist_upload_name = "#{options[:app_name]}.#{options[:build_number]}.ipa".gsub(" ", "+")
+  plist_upload_name = "#{options[:app_name]}.#{options[:build_number]}.ipa"
   base_path_in_bucket = ''
   if options[:path_in_bucket]
     base_path_in_bucket = options[:path_in_bucket]
@@ -210,7 +210,7 @@ begin
   build_number=options[:build_number]
   plist=IpaInstallPlistGenerator::PlistGenerator.new.generate_plist_string(public_url_ipa, bundle_id, app_name, bundle_version, app_icon_url, itunes_icon_url)
 
-  plist_file="#{app_name}.#{build_number}.plist".gsub(" ", "+")
+  plist_file="#{app_name}.#{build_number}.plist"
   File.open("#{plist_file}", "w") do |f|
     f.write(plist)
   end
