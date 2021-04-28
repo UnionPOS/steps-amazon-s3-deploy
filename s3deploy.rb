@@ -44,7 +44,7 @@ def log_done(message)
 end
 
 def s3_object_uri_for_bucket_and_path(bucket_name, path_in_bucket)
-  return "s3://#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
+  return "s3://#{bucket_name}/#{path_in_bucket}".gsub(" ", "_")
 end
 
 def public_url_for_bucket_and_path(bucket_name, bucket_region, path_in_bucket)
@@ -52,7 +52,7 @@ def public_url_for_bucket_and_path(bucket_name, bucket_region, path_in_bucket)
     return "https://s3.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "_")
   end
 
-  return "https://s3-#{bucket_region}.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
+  return "https://s3-#{bucket_region}.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "_")
 end
 
 def export_output(out_key, out_value)
