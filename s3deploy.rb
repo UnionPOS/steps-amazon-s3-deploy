@@ -144,7 +144,7 @@ begin
 
   #
   # define object path
-  plist_upload_name = "#{options[:app_name]}.#{options[:build_number]}.ipa"
+  plist_upload_name = "#{options[:app_name]}.#{options[:build_number]}.ipa".gsub(" ", "+")
   base_path_in_bucket = ''
   if options[:path_in_bucket]
     base_path_in_bucket = options[:path_in_bucket]
@@ -210,7 +210,7 @@ begin
   build_number=options[:build_number]
   plist=IpaInstallPlistGenerator::PlistGenerator.new.generate_plist_string(public_url_ipa, bundle_id, app_name, bundle_version, app_icon_url, itunes_icon_url)
 
-  plist_file="#{app_name}.#{build_number}.plist"
+  plist_file="#{app_name}.#{build_number}.plist".gsub(" ", "+")
   File.open("#{plist_file}", "w") do |f|
     f.write(plist)
   end
