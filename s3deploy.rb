@@ -1,3 +1,14 @@
+# --------------------------
+# --- Gems
+# --------------------------
+require 'bundler/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  gem 'ipa_install_plist_generator'
+end
+
+puts 'Gems installed and loaded!'
 
 # --------------------------
 # --- Constants & Variables
@@ -63,14 +74,16 @@ end
 options = {
   ipa: ENV['ipa_path'],
   dsym: ENV['dsym_path'],
-  app_slug: ENV['app_slug'],
-  build_slug: ENV['build_slug'],
   access_key: ENV['aws_access_key'],
   secret_key: ENV['aws_secret_key'],
   bucket_name: ENV['bucket_name'],
   bucket_region: ENV['bucket_region'],
   path_in_bucket: ENV['path_in_bucket'],
   acl: ENV['file_access_level'],
+  build_number: ENV['build_number'],
+  app_name: ENV['app_name'],
+  bundle_id: ENV['bundle_id'],
+  bundle_version: ENV['bundle_version'],
   app_icon_url: ENV['app_icon_url'],
   itunes_icon_url: ENV['itunes_icon_url']
 }
@@ -80,8 +93,6 @@ options = {
 log_info('Configs:')
 log_details("* ipa_path: #{options[:ipa]}")
 log_details("* dsym_path: #{options[:dsym]}")
-log_details("* app_slug: #{options[:app_slug]}")
-log_details("* build_slug: #{options[:build_slug]}")
 
 log_details('* aws_access_key: ') if options[:access_key].to_s == ''
 log_details('* aws_access_key: ***') unless options[:access_key].to_s == ''
@@ -94,6 +105,10 @@ log_details("* bucket_region: #{options[:bucket_region]}")
 log_details("* path_in_bucket: #{options[:path_in_bucket]}")
 log_details("* file_access_level: #{options[:acl]}")
 
+log_details("* build_number: #{options[:build_number]}")
+log_details("* app_name: #{options[:app_name]}")
+log_details("* bundle_id: #{options[:bundle_id]}")
+log_details("* bundle_version: #{options[:bundle_version]}")
 log_details("* app_icon_url: #{options[:app_icon_url]}")
 log_details("* itunes_icon_url: #{options[:itunes_icon_url]}")
 
@@ -108,15 +123,16 @@ begin
     log_warn("DSYM file not found. To generate debug symbols (dSYM) go to your Xcode Project's Settings - Build Settings - Debug Information Format and set it to DWARF with dSYM File.")
   end
 
-  fail 'Missing required input: app_slug' if options[:app_slug].to_s.eql?('')
-  fail 'Missing required input: build_slug' if options[:build_slug].to_s.eql?('')
-
   fail 'Missing required input: aws_access_key' if options[:access_key].to_s.eql?('')
   fail 'Missing required input: aws_secret_key' if options[:secret_key].to_s.eql?('')
 
   fail 'Missing required input: bucket_name' if options[:bucket_name].to_s.eql?('')
   fail 'Missing required input: file_access_level' if options[:acl].to_s.eql?('')
 
+  fail 'Missing required input: build_number' if options[:build_number].to_s.eql?('')
+  fail 'Missing required input: app_name' if options[:app_name].to_s.eql?('')
+  fail 'Missing required input: bundle_id' if options[:bundle_id].to_s.eql?('')
+  fail 'Missing required input: bundle_version' if options[:bundle_version].to_s.eql?('')
   fail 'Missing required input: app_icon_url' if options[:app_icon_url].to_s.eql?('')
   fail 'Missing required input: itunes_icon_url' if options[:itunes_icon_url].to_s.eql?('')
 
@@ -128,12 +144,13 @@ begin
 
   #
   # define object path
+  plist_upload_name = "#{app_name}.#{build_number}.ipa"
   base_path_in_bucket = ''
   if options[:path_in_bucket]
     base_path_in_bucket = options[:path_in_bucket]
+    ipa_path_in_bucket = "#{base_path_in_bucket}/#{plist_upload_name}"
   else
-    utc_timestamp = Time.now.utc.to_i
-    base_path_in_bucket = "bitrise_#{options[:app_slug]}/#{utc_timestamp}_build_#{options[:build_slug]}"
+    ipa_path_in_bucket = "#{plist_upload_name}"
   end
 
   #
@@ -154,7 +171,6 @@ begin
   # ipa upload
   log_info('Uploading IPA...')
 
-  ipa_path_in_bucket = "#{base_path_in_bucket}/#{File.basename(options[:ipa])}"
   ipa_full_s3_path = s3_object_uri_for_bucket_and_path(options[:bucket_name], ipa_path_in_bucket)
   public_url_ipa = public_url_for_bucket_and_path(options[:bucket_name], options[:bucket_region], ipa_path_in_bucket)
 
@@ -186,28 +202,30 @@ begin
   # plist generation - we have to run it after we have obtained the public url to the ipa
   log_info('Generating Deploy Info.plist...')
 
-  success = system("sh #{@this_script_path}/gen_plist.sh")
+  plist=IpaInstallPlistGenerator::PlistGenerator.new.generate_plist_string(ipa_url, bundle_id, app_name, bundle_version, app_icon_url, itunes_icon_url)
 
-  fail 'Failed to generate info.plist' unless success
+  plist_file="#{app_name}.#{build_number}.plist"
+  File.open("#{plist_file}", "w") do |f|
+    f.write(plist)
+  end
 
-  plist_name = ENV["GENERATED_PLIST_NAME"]
-  log_done("Generating #{plist_name} succeeded")
+  log_done("Generating #{plist_file} succeeded")
 
   #
   # plist upload
-  plist_local_path = ENV["DEPLOY_PLIST_PATH"]
+  plist_local_path = "./#{plist_file}"
   public_url_plist = ''
 
   if File.exist?(plist_local_path)
-    log_info("Uploading #{plist_name}...")
+    log_info("Uploading #{plist_file}...")
 
-    plist_path_in_bucket = "#{base_path_in_bucket}/#{plist_name}"
+    plist_path_in_bucket = "#{base_path_in_bucket}/#{plist_file}"
     plist_full_s3_path = "s3://#{options[:bucket_name]}/#{plist_path_in_bucket}"
     public_url_plist = public_url_for_bucket_and_path(options[:bucket_name], options[:bucket_region], plist_path_in_bucket)
 
-    fail "Failed to upload #{plist_name}" unless do_s3upload(plist_local_path, plist_full_s3_path, acl_arg)
+    fail "Failed to upload #{plist_file}" unless do_s3upload(plist_local_path, plist_full_s3_path, acl_arg)
 
-    log_done("#{plist_name} upload success")
+    log_done("#{plist_file} upload success")
   else
     log_warn('NO Info.plist generated :<')
   end

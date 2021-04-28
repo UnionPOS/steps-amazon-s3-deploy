@@ -81,7 +81,4 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 </dict>
 </plist>" > "${generated_plist_path}"
 
-export DEPLOY_PLIST_PATH="${BITRISE_DEPLOY_DIR}/${GENERATED_PLIST_NAME}"
-cp "$generated_plist_path" "$DEPLOY_PLIST"
-
 rm -rf ./Payload

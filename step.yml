@@ -34,20 +34,6 @@ inputs:
       title: "DSYM path (optional)"
       summary: ""
       description: ""
-  - app_slug: "$BITRISE_APP_SLUG"
-    opts:
-      title: "BITRISE's App-Slug variable (passed automatically on Bitrise)"
-      summary: ""
-      description: ""
-      is_required: true
-      is_expand: true
-  - build_slug: "$BITRISE_BUILD_SLUG"
-    opts:
-      title: "BITRISE's Build-Slug variable (passed automatically on Bitrise)"
-      summary: ""
-      description: ""
-      is_required: true
-      is_expand: true
   - aws_access_key: ""
     opts:
       title: "Amazon AWS Access Key"
@@ -79,20 +65,42 @@ inputs:
 
         If you use default s3 region (us-east-1), you can leave it empty,
         otherwise you should provide this input.
-  - path_in_bucket: "bitrise_$BITRISE_APP_SLUG/${BITRISE_BUILD_TRIGGER_TIMESTAMP}_build_${BITRISE_BUILD_SLUG}"
+  - path_in_bucket: ""
     opts:
       title: "Amazon S3 File Path In Bucket"
       summary: ""
-      description: |-
-        Optional, if there is no specified value, then the default will be:
-
-            bitrise_$BITRISE_APP_SLUG/${BITRISE_BUILD_TRIGGER_TIMESTAMP}_build_${BITRISE_BUILD_SLUG}
+      description: ""
   - file_access_level: "public_read"
     opts:
       title: "Amazon S3 file access level"
       value_options:
         - "private"
         - "public_read"
+      is_required: true
+  - build_number: "$BITRISE_BUILD_NUMBER"
+    opts:
+      title: "Build Number"
+      summary: ""
+      description: ""
+      is_required: true
+  - app_name: ""
+    opts:
+      title: "App Name"
+      summary: ""
+      description: |
+        Used to create download plist.
+      is_required: true
+  - bundle_id: ""
+    opts:
+      title: "Bundle Identifier"
+      summary: ""
+      description: ""
+      is_required: true
+  - bundle_version: ""
+    opts:
+      title: "Bundle Version"
+      summary: ""
+      description: ""
       is_required: true
   - app_icon_url: ""
     opts:
