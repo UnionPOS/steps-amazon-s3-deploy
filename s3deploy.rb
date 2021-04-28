@@ -226,7 +226,7 @@ begin
     log_info("Uploading #{plist_file}...")
 
     plist_path_in_bucket = "#{base_path_in_bucket}/#{plist_file}"
-    plist_full_s3_path = "s3://#{options[:bucket_name]}/#{plist_path_in_bucket}"
+    plist_full_s3_path = s3_object_uri_for_bucket_and_path(options[:bucket_name], plist_path_in_bucket)
     public_url_plist = public_url_for_bucket_and_path(options[:bucket_name], options[:bucket_region], plist_path_in_bucket)
 
     fail "Failed to upload #{plist_file}" unless do_s3upload(plist_local_path, plist_full_s3_path, acl_arg)
