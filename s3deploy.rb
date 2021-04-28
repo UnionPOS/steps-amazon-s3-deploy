@@ -49,7 +49,7 @@ end
 
 def public_url_for_bucket_and_path(bucket_name, bucket_region, path_in_bucket)
   if bucket_region.to_s == '' || bucket_region.to_s == 'us-east-1'
-    return "https://s3.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
+    return "https://s3.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "_")
   end
 
   return "https://s3-#{bucket_region}.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "+")
