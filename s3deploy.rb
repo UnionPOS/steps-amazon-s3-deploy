@@ -48,10 +48,6 @@ def s3_object_uri_for_bucket_and_path(bucket_name, path_in_bucket)
 end
 
 def public_url_for_bucket_and_path(bucket_name, bucket_region, path_in_bucket)
-  if bucket_region.to_s == '' || bucket_region.to_s == 'us-east-1'
-    return "https://s3.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "_")
-  end
-
   return "https://s3-#{bucket_region}.amazonaws.com/#{bucket_name}/#{path_in_bucket}".gsub(" ", "_")
 end
 
@@ -147,8 +143,8 @@ begin
   plist_upload_name = "#{options[:app_name]}.#{options[:build_number]}.ipa"
   base_path_in_bucket = ''
   if options[:path_in_bucket]
-    base_path_in_bucket = options[:path_in_bucket]
-    ipa_path_in_bucket = "#{base_path_in_bucket}/#{plist_upload_name}"
+    base_path_in_bucket = "#{options[:path_in_bucket]}/"
+    ipa_path_in_bucket = "#{base_path_in_bucket}#{plist_upload_name}"
   else
     ipa_path_in_bucket = "#{plist_upload_name}"
   end
@@ -185,7 +181,7 @@ begin
   if options[:dsym]
     log_info('Uploading dSYM...')
 
-    dsym_path_in_bucket = "#{base_path_in_bucket}/#{File.basename(options[:dsym])}"
+    dsym_path_in_bucket = "#{base_path_in_bucket}#{File.basename(options[:dsym])}"
     dsym_full_s3_path = s3_object_uri_for_bucket_and_path(options[:bucket_name], dsym_path_in_bucket)
     public_url_dsym = public_url_for_bucket_and_path(options[:bucket_name], options[:bucket_region], dsym_path_in_bucket)
 
@@ -225,7 +221,7 @@ begin
   if File.exist?(plist_local_path)
     log_info("Uploading #{plist_file}...")
 
-    plist_path_in_bucket = "#{base_path_in_bucket}/#{plist_file}"
+    plist_path_in_bucket = "#{base_path_in_bucket}#{plist_file}"
     plist_full_s3_path = s3_object_uri_for_bucket_and_path(options[:bucket_name], plist_path_in_bucket)
     public_url_plist = public_url_for_bucket_and_path(options[:bucket_name], options[:bucket_region], plist_path_in_bucket)
 
